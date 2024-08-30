@@ -3,63 +3,62 @@ setlocal EnableDelayedExpansion
 
 :: Define variables
 set PYTHON_VERSION=3.12.1
-set LOG_DIR=%USERPROFILE%\Desktop\Python_Install_Logs
-set LOG_FILE=!LOG_DIR!\python_install_!PYTHON_VERSION!.log
+set PYTHON_INSTALLER_PATH=%USERPROFILE%\Downloads
 set INSTALLER_NAME=python-!PYTHON_VERSION!-amd64.exe
 set INSTALLER_URL=https://www.python.org/ftp/python/!PYTHON_VERSION!/!INSTALLER_NAME!
+set LOG_DIR=%USERPROFILE%\Desktop\Python_Install_Logs
+set LOG_FILE=!LOG_DIR!\python_install_!PYTHON_VERSION!.log
 
-:: Create log directory
+:: Check and create log directory
 if not exist "!LOG_DIR!" (
+    echo Creating log directory...
     mkdir "!LOG_DIR!"
     if errorlevel 1 (
-        echo Failed to create log directory. Check permissions.
+        echo Failed to create log directory at !LOG_DIR!. Check permissions.
+        pause
         goto end
     )
 )
 
-:: Start logging
+:: Output to console and log file
+echo %DATE% %TIME%: Starting download of Python !PYTHON_VERSION%! >> "!LOG_FILE!"
+echo Starting download of Python !PYTHON_VERSION%!...
+
+:: Download Python installer using PowerShell
+powershell -Command "Invoke-WebRequest -Uri '!INSTALLER_URL!' -OutFile '!PYTHON_INSTALLER_PATH!\!INSTALLER_NAME!'" >> "!LOG_FILE!" 2>&1
+if errorlevel 1 (
+    echo Download failed, see log at !LOG_FILE! for details.
+    pause
+    goto end
+)
+
 echo %DATE% %TIME%: Starting installation of Python !PYTHON_VERSION%! >> "!LOG_FILE!"
+echo Starting installation of Python !PYTHON_VERSION%!...
 
-:: Download Python installer
-echo Downloading Python !PYTHON_VERSION%! installer
-powershell -Command "Invoke-WebRequest -Uri '!INSTALLER_URL!' -OutFile '!INSTALLER_NAME!'" >> "!LOG_FILE!" 2>&1
+:: Install Python
+"!PYTHON_INSTALLER_PATH!\!INSTALLER_NAME!" /passive InstallAllUsers=1 PrependPath=1 Include_test=0 >> "!LOG_FILE!" 2>&1
 if errorlevel 1 (
-    echo Failed to download Python installer. Check log file for details.
-    echo %DATE% %TIME%: Failed to download Python installer >> "!LOG_FILE!"
+    echo Installation failed, see log at !LOG_FILE! for details.
+    pause
     goto end
 )
 
-echo Successfully downloaded Python installer
-echo %DATE% %TIME%: Successfully downloaded Python installer >> "!LOG_FILE!"
-
-:: Install Python silently
-echo Installing Python !PYTHON_VERSION!...
-!INSTALLER_NAME! /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 >> "!LOG_FILE!" 2>&1
-if errorlevel 1 (
-    echo Python installation failed. Check log file for details.
-    echo %DATE% %TIME%: Python installation failed >> "!LOG_FILE!"
-    goto end
-)
-
-echo Python !PYTHON_VERSION! installed successfully
-echo %DATE% %TIME%: Python !PYTHON_VERSION! installed successfully >> "!LOG_FILE!"
-
-:: Verify installation
 echo Verifying Python installation...
-python --version >> "!LOG_FILE!" 2>&1
+py -3.12 -c "import sys; print('Python version:', sys.version)" >> "!LOG_FILE!" 2>&1
 if errorlevel 1 (
-    echo Python verification failed. Check log file for details.
-    echo %DATE% %TIME%: Python verification failed >> "!LOG_FILE!"
+    echo Verification failed. Python 3.12.1 might not have installed correctly.
+    pause
     goto end
 )
 
-echo Python installation verified
-echo %DATE% %TIME%: Python installation verified >> "!LOG_FILE!"
+echo Cleaning up installation files...
+del /f /q "!PYTHON_INSTALLER_PATH!\!INSTALLER_NAME!" >> "!LOG_FILE!" 2>&1
 
-echo Installation completed successfully. Review the log file for details.
-echo %DATE% %TIME%: Installation completed successfully >> "!LOG_FILE!"
+echo Installation and verification completed successfully.
+echo %DATE% %TIME%: Python !PYTHON_VERSION! installation and verification completed successfully. >> "!LOG_FILE!"
+
+echo Installation complete. Press any key to exit.
+pause
 
 :end
-echo Press any key to exit...
-pause >nul
 endlocal
