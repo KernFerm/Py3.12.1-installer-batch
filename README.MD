@@ -21,8 +21,6 @@ This repository contains a robust batch script designed to install Python 3.12.1
    - Navigate to the location where you downloaded the script.
    - Right-click on `install_python_3.12.1.bat` and select `Run as administrator`.
 
-## Script Breakdown
-
 ### Variables
 
 - **PYTHON_VERSION:** Specifies the Python version to install (3.12.1).
