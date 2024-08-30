@@ -16,7 +16,7 @@ if not exist "%LOG_DIR%" (
 :: Log function
 :log
 echo %DATE% %TIME%: %* >> "%LOG_FILE%"
-exit /b 0
+goto :eof
 
 :: Start logging
 call :log "Starting installation of Python %PYTHON_VERSION%"
@@ -27,7 +27,7 @@ powershell -Command "Invoke-WebRequest -Uri %INSTALLER_URL% -OutFile %INSTALLER_
 if errorlevel 1 (
     call :log "Failed to download Python installer"
     pause
-    exit /b 1
+    goto :eof
 )
 call :log "Successfully downloaded Python installer"
 
@@ -37,7 +37,7 @@ call :log "Installing Python %PYTHON_VERSION%"
 if errorlevel 1 (
     call :log "Python installation failed"
     pause
-    exit /b 1
+    goto :eof
 )
 call :log "Python %PYTHON_VERSION% installed successfully"
 
@@ -47,7 +47,7 @@ python --version >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
     call :log "Python verification failed"
     pause
-    exit /b 1
+    goto :eof
 )
 call :log "Python installation verified"
 
@@ -60,4 +60,4 @@ call :log "Installation completed successfully"
 :: Pause to allow the user to see the final output
 pause
 endlocal
-exit /b 0
+pause
