@@ -16,7 +16,7 @@ if not exist "%LOG_DIR%" (
 :: Log function
 :log
 echo %DATE% %TIME%: %* >> "%LOG_FILE%"
-exit /b
+exit /b 0
 
 :: Start logging
 call :log "Starting installation of Python %PYTHON_VERSION%"
@@ -26,6 +26,7 @@ call :log "Downloading Python %PYTHON_VERSION% installer"
 powershell -Command "Invoke-WebRequest -Uri %INSTALLER_URL% -OutFile %INSTALLER_NAME%" >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
     call :log "Failed to download Python installer"
+    pause
     exit /b 1
 )
 call :log "Successfully downloaded Python installer"
@@ -35,6 +36,7 @@ call :log "Installing Python %PYTHON_VERSION%"
 %INSTALLER_NAME% /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
     call :log "Python installation failed"
+    pause
     exit /b 1
 )
 call :log "Python %PYTHON_VERSION% installed successfully"
@@ -44,6 +46,7 @@ call :log "Verifying Python installation"
 python --version >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
     call :log "Python verification failed"
+    pause
     exit /b 1
 )
 call :log "Python installation verified"
@@ -54,10 +57,7 @@ del /f /q %INSTALLER_NAME% >> "%LOG_FILE%" 2>&1
 
 call :log "Installation completed successfully"
 
-:: Pause to allow the user to close the window
+:: Pause to allow the user to see the final output
 pause
 endlocal
-
-:: Pause again to keep the window open
-pause
 exit /b 0
