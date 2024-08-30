@@ -54,6 +54,6 @@ If you have suggestions or improvements, please feel free to share by contacting
 
 ## Contact
 
-For any questions or issues, please reach out to [kernferm@gmail.com](mailto:kernferm@gmail.com).
+For any questions or issues, please [create a issue](https://github.com/KernFerm/Py3.12.1-installer-batch/issues).
 ----------------
 ----------------
