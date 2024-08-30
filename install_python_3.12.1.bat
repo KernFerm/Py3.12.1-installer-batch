@@ -57,4 +57,7 @@ call :log "Installation completed successfully"
 :: Pause to allow the user to close the window
 pause
 endlocal
+
+:: Pause again to keep the window open
+pause
 exit /b 0
